@@ -29,12 +29,18 @@
 //			gameMode下的函数请加 "g_" 前缀，learboardMode下的函数请加 "l_" 前缀
 //Update7-9:坐标全部使用传参处理
 //Update7-10:暂停继续按钮坐标:(85 802)(327 802)
+#define YAGE //注释则打开EGE模式
+#ifdef YAGE
+#include "yage.h"
+#else
+#include "graphics.h"
+#endif 
+
 #include <iostream>
 #include <vector>
 #include <deque>
 #include <sstream>
 #include <ctime>
-#include "yage.h"
 #include "leaderboardMode.h"
 #include "Map.h"
 #include "Piece.h"
@@ -52,7 +58,8 @@
 //g_replenishMap();
 
 void resource(Option);
-void resourceSkin(int);
+void resourceSkin_yage(int);
+void resourceSkin_ege(int);
 int gameMode();
 int leaderboardMode();//+
 int optionMode();//+
@@ -60,7 +67,7 @@ int exitMode();
 int init(void);
 void meun(int);
 //
-int start()
+int start_yage()
 {
 	return 1;
 }
@@ -68,8 +75,15 @@ int main(int argc, char*argv[])
 {
 
 	init();
-	meun(start());
+
+#ifdef YAGE
+	while (start_yage())
+		meun(start_yage());
 	yage_quit();
+#else
+	while (start_ege())
+		meun(start_ege());
+#endif
 	return 0;
 }
 
@@ -85,9 +99,6 @@ int init(void)
 void meun(int playerChoose)
 {
 	int condition = 1;
-
-	while (condition)
-	{
 
 		switch (playerChoose)
 		{
@@ -111,7 +122,6 @@ void meun(int playerChoose)
 			condition = 1;
 			break;
 		}
-	}
 }
 
 int gameMode()
@@ -139,11 +149,17 @@ int exitMode()
 
 void resource(Option option)
 {
+#ifdef YAGE
 	struct yage_canvas *Background = yage_canvas_load_image("Bk.png");
-	resourceSkin(option.getSkin());
+	resourceSkin_yage(option.getSkin());
+#else
+	resourceSkin_ege(option.getSkin());
+#endif
+
 }
 
-void resourceSkin(int skin)
+//Only Yage
+void resourceSkin_yage(int skin)
 {
 	std::vector<struct yage_canvas *> pieceSkin;
 	std::string temp;
